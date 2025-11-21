@@ -4,9 +4,16 @@ title: Dashboard
 toc: false
 ---
 
-<div>
-  <h1>Data Dashboard</h1>
+# Pydre Data Dashboard
+
+<div class="tip">
+
+This is a dashboard designed to help perform quick visualizations of the data from R2Drv project.
+Please select a CSV file from the 
+
 </div>
+
+
 
 ```js
 //choose input file
@@ -14,7 +21,7 @@ import { csvParse, autoType } from "npm:d3-dsv";
 
 const fileName = view(
   Inputs.file({
-    label: "Upload CSV File",
+    label: "Select CSV File",
     accept: ".csv",
     required: true
   })
@@ -37,7 +44,6 @@ const customAutoType = (d) => {
 };
 
 const example_data = raw.map(customAutoType);
-view(example_data);
 ``` 
 
 ```js
