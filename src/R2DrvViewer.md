@@ -95,19 +95,54 @@ function histPlot(graph, xAxis, yAxis, fill, width) {
 }))
 }
 
-function dotPlot(graph, xAxis, yAxis, fill, width){
-  return (Plot.plot({
-    width,
-    color: {legend: true},
-      marginBottom: 60,
+function dotPlot(graph, dodge, xAxis, yAxis, fill, width){
+  const height = 500;
+  const marginTop = 20;
+  const marginBottom = 60;
+  const marginLeft = 70;
+  const marginRight = 20;
+
+let chart;
+
+if ((dodge.length > 0) && ((typeof data[1][xAxis]) === "string")){
+    chart = (Plot.plot({
+      width: width,
+      height: height,
+      marginTop: marginTop,
+      marginRight: marginRight,
+      marginBottom: marginBottom,
+      marginLeft: marginLeft,
+      color: {legend: true},
+        marginBottom: 60,
     x: {
       tickRotate: -30,
     },
-  marks: [
-    Plot.dot(data, {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true}),
-    Plot.crosshair(data, {x: xAxis, y: yAxis,color: fill, opacity: 0.5})
-  ]
-}))
+    marks: [
+      Plot.dot(data, Plot.dodgeX("middle", {fx: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true})),
+      Plot.crosshair(data, {x: xAxis, y: yAxis,color: fill, opacity: 0.5})
+    ]
+  }))
+  } else {
+    chart = (Plot.plot({
+      width: width,
+      height: height,
+      marginTop: marginTop,
+      marginRight: marginRight,
+      marginBottom: marginBottom,
+      marginLeft: marginLeft,
+      color: {legend: true},
+        marginBottom: 60,
+    x: {
+      tickRotate: -30,
+    },
+    marks: [
+      Plot.dot(data, {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true}),
+      Plot.crosshair(data, {x: xAxis, y: yAxis,color: fill, opacity: 0.5})
+    ]
+  }))
+}
+
+return chart;
 }
 
 const graphTypes = [
@@ -121,40 +156,40 @@ const graphType = view(Inputs.select(graphTypes, {label: "Choose Graph"}));
 ```js
 console.log(graphType)
 
-function chooseGraph(data, xCol, yCol, fill, width){
+function chooseGraph(data, dodge, xCol, yCol, fill, width){
   switch (graphType){
     case "Histogram":
       return histPlot(data, xCol, yCol, fill, width);
       break;
     case "Dot Plot":
-      return dotPlot(data, xCol, yCol, fill, width);
+      return dotPlot(data, dodge, xCol, yCol, fill, width);
       break;
     default:
-      return dotPlot(data, xCol, yCol, fill, width);
+      return dotPlot(data, dodge, xCol, yCol, fill, width);
       break;
   }
   
 }
 
 //make standard graphs if xcol exists
-function graphs(card, data, xCol, yCol, fill, width){
+function graphs(card, data, dodge, xCol, yCol, fill, width){
   switch(card){
     case 1:
-      return chooseGraph(data, xCol, yCol, fill, width);
+      return chooseGraph(data, dodge, xCol, yCol, fill, width);
       break;
     case 2:
       if(headers.includes("ParticipantID")){
-        return dotPlot(data, "ParticipantID", yCol, fill, width);
+        return dotPlot(data, dodge, "ParticipantID", yCol, fill, width);
       }
       break;
     case 3:
       if(headers.includes("ScenarioName")){
-        return dotPlot(data, "ScenarioName", yCol, fill, width);
+        return dotPlot(data, dodge, "ScenarioName", yCol, fill, width);
       }
       break;
     case 4:
       if(headers.includes("ROI")){
-        return dotPlot(data, "ROI", yCol, fill, width);
+        return dotPlot(data, dodge, "ROI", yCol, fill, width);
       }
       break;
     default:
@@ -163,28 +198,30 @@ function graphs(card, data, xCol, yCol, fill, width){
   
 }
 ```
-
+```js
+const dodgeOne = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
+```
 <div class = "grid grid-cols-2">
   <div class="card">
-    ${resize((width) => graphs(1, data, xCol, yCol, fill, width) )}
+    ${resize((width) => graphs(1, data, dodgeOne, xCol, yCol, fill, width) )}
   </div>
 
   <div class="card">
-    ${resize((width) => graphs(2, data, xCol, yCol, fill, width) )}
+    ${resize((width) => graphs(2, data, dodgeOne, xCol, yCol, fill, width) )}
   </div>
 </div>
 
 
 <div class = "grid grid-cols-2">
   <div class="card">
-    ${resize((width) => graphs(3, data, xCol, yCol, fill, width) )}
+    ${resize((width) => graphs(3, data, dodgeOne, xCol, yCol, fill, width) )}
   </div>
 
 
 
 
   <div class="card">
-    ${resize((width) => graphs(4, data, xCol, yCol, fill, width) )}
+    ${resize((width) => graphs(4, data, dodgeOne, xCol, yCol, fill, width) )}
   </div>
 </div>
 
