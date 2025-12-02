@@ -62,26 +62,76 @@ const channels = view(Inputs.checkbox(headers, {label: "Channels"}));
 const channelObj = Object.fromEntries(channels.map(c => [c, c]));
 
 function plot(data, xAxis, yAxis, fill, width) {
-  return (Plot.plot({
-    width,
+  
+    const p = Plot.plot({
+            width: 2000,
     color: {legend: true},
     x: {
-    tickRotate: -30,
+        tickSpacing: 100,    
+        tickRotate: -30,
     },
   marks: [
-    Plot.auto(data, {x: xAxis, y: yAxis, color: fill, channels: channelObj, tip: true}),
+    Plot.dot(data, {x: xAxis, y: yAxis, color: fill, channels: channelObj, tip: true}),
     Plot.crosshair(data, {x: xAxis, y: yAxis,color: fill, opacity: 0.5})
   ]
-}))
+})
+    p.classList.add("chart");
+    return p;
+}
+```
+
+```js
+
+function makeplot(data, xAxis, yAxis, fill) {
+
+    const height = 400
+    const marginTop = 30
+    const marginBottom = 60
+
+    const yScale = Plot.scale({ y: { domain: [-1, 10], label: "↑ y" } })
+    
+    const yAxis_plot = Plot.plot({
+        width: 40,
+        height,
+        marginTop,
+        marginBottom,
+        y: yScale
+    });
+
+    const chart = Plot.plot({
+        width: width * 3,
+        height,
+        marginTop,
+        marginBottom,
+        marginLeft: 10,
+        x: {nice: true,
+            tickRotate: -30},
+        y: yScale,
+        marks: [
+            Plot.dot(data, {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true}),
+            Plot.crosshair(data, {x: xAxis, y: yAxis,color: fill, opacity: 0.5})
+            
+        ]
+    });
+    chart.classList.add("chart");
+
+    const scrollbar = html`<div class="scrollbar">`;
+    scrollbar.append(chart);
+
+    const div = html`<div class="container">`;
+    div.append(yAxis_plot, scrollbar);
+    return div;
 }
 ```
 
 
 <div>
 
-  <div class="card">
-  ${resize((width) => plot(example_data, xCol, yCol, fill, width) )} 
-  </div> 
+<div class="container">
+<div class="scrollbar">
+  ${makeplot(example_data, xCol, yCol, fill) }
+</div>
+</div>
 
   <div class="card">
     ${Inputs.table(example_data)}
@@ -129,5 +179,18 @@ function plot(data, xAxis, yAxis, fill, width) {
     font-size: 90px;
   }
 }
+
+  .container {
+    display: flex;
+    align-items: flex-start;
+    padding-bottom: 30px;
+  }
+  .container .scrollbar {
+    overflow-x: scroll;
+    flex: 1;
+  }
+  .container .chart {
+    max-width: none;
+  }
 
 </style>
