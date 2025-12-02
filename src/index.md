@@ -83,13 +83,43 @@ function plot(data, xAxis, yAxis, fill, width) {
 ```js
 
 function makeplot(data, xAxis, yAxis, fill) {
+  const height = 500;
+  const marginTop = 20;
+  const marginBottom = 60;
+  const marginLeft = 70;
+  const marginRight = 20;
 
-    const height = 400
-    const marginTop = 30
-    const marginBottom = 60
+  const yData = []
+  let numbers = false;
 
-    const yScale = Plot.scale({ y: { domain: [-1, 10], label: "↑ y" } })
-    
+  for (let i = 0; i < data.length; i++) {
+    yData.push(data[i][yAxis]);
+    if (typeof (data[i][yAxis]) === "number"){
+      numbers = true;
+    }
+  }
+
+  let yScale;
+  if (numbers){
+   yScale = Plot.scale({y: {domain: d3.extent(yData), label: yAxis}});
+  } else {
+    yScale = Plot.scale({y: {domain: [yData], label: yAxis}});
+  }
+
+const xData = []
+  for (let i = 0; i < data.length; i++) {
+    if (!(xData.includes(data[i][xAxis]))){
+    xData.push(data[i][xAxis]);
+    }
+  }
+
+  let widthData = xData.length * 25;
+
+  if(xData.length < 10){
+    widthData = 400;
+  }
+
+
     const yAxis_plot = Plot.plot({
         width: 40,
         height,
@@ -99,7 +129,7 @@ function makeplot(data, xAxis, yAxis, fill) {
     });
 
     const chart = Plot.plot({
-        width: width * 3,
+        width: widthData,
         height,
         marginTop,
         marginBottom,
