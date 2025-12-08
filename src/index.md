@@ -9,7 +9,7 @@ toc: false
 <div class="tip">
 
 This is a dashboard designed to help perform quick visualizations of the data from R2Drv project.
-Please select a CSV file from the 
+Please select a CSV file from the data folder
 
 </div>
 
@@ -56,33 +56,14 @@ const yCol = view(Inputs.select(headers, { label: "Y Axis", value: headers[1] })
 const fill = view(Inputs.select(headers, { label: "Color Fill", value: headers[1] }));
 
 const channels = view(Inputs.checkbox(headers, {label: "Channels"}));
+
+const dodge = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
 ```
 
 ```js
 const channelObj = Object.fromEntries(channels.map(c => [c, c]));
 
-function plot(data, xAxis, yAxis, fill, width) {
-  
-    const p = Plot.plot({
-            width: 2000,
-    color: {legend: true},
-    x: {
-        tickSpacing: 100,    
-        tickRotate: -30,
-    },
-  marks: [
-    Plot.dot(data, {x: xAxis, y: yAxis, color: fill, channels: channelObj, tip: true}),
-    Plot.crosshair(data, {x: xAxis, y: yAxis,color: fill, opacity: 0.5})
-  ]
-})
-    p.classList.add("chart");
-    return p;
-}
-```
-
-```js
-
-function makeplot(data, xAxis, yAxis, fill) {
+function makeplot(data, xAxis, yAxis, fill, dodge) {
   const height = 500;
   const marginTop = 20;
   const marginBottom = 60;
@@ -128,7 +109,25 @@ const xData = []
         y: yScale
     });
 
-    const chart = Plot.plot({
+let chart;
+     if ((dodge.length > 0) && ((typeof data[1][xAxis]) === "string")){
+     chart = Plot.plot({
+        width: widthData,
+        height,
+        marginTop,
+        marginBottom,
+        marginLeft: 10,
+        x: {nice: true,
+            tickRotate: -30},
+        y: yScale,
+        marks: [
+            Plot.dot(data, Plot.dodgeX("middle", {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true})),
+            Plot.crosshair(data, {x: xAxis, y: yAxis,color: fill, opacity: 0.5})
+            
+        ]
+    });
+  } else {
+     chart = Plot.plot({
         width: widthData,
         height,
         marginTop,
@@ -143,6 +142,8 @@ const xData = []
             
         ]
     });
+  }
+
     chart.classList.add("chart");
 
     const scrollbar = html`<div class="scrollbar">`;
@@ -159,7 +160,7 @@ const xData = []
 
 <div class="container">
 <div class="scrollbar">
-  ${makeplot(example_data, xCol, yCol, fill) }
+  ${makeplot(example_data, xCol, yCol, fill, dodge) }
 </div>
 </div>
 

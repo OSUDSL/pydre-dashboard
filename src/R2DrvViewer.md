@@ -95,54 +95,94 @@ function histPlot(graph, xAxis, yAxis, fill, width) {
 }))
 }
 
-function dotPlot(graph, dodge, xAxis, yAxis, fill, width){
+function dotPlot(graph, dodge, xAxis, yAxis, fill){
   const height = 500;
   const marginTop = 20;
   const marginBottom = 60;
   const marginLeft = 70;
   const marginRight = 20;
 
-let chart;
+  const yData = []
+  let numbers = false;
 
-if ((dodge.length > 0) && ((typeof data[1][xAxis]) === "string")){
+  for (let i = 0; i < graph.length; i++) {
+    yData.push(graph[i][yAxis]);
+    if (typeof (graph[i][yAxis]) === "number"){
+      numbers = true;
+    }
+  }
+
+  let yScale;
+  if (numbers){
+   yScale = Plot.scale({y: {domain: d3.extent(yData), label: yAxis}});
+  } else {
+    yScale = Plot.scale({y: {domain: [yData], label: yAxis}});
+  }
+
+const xData = []
+  for (let i = 0; i < graph.length; i++) {
+    if (!(xData.includes(graph[i][xAxis]))){
+    xData.push(graph[i][xAxis]);
+    }
+  }
+
+  let widthData = xData.length * 25;
+
+  if(xData.length < 10){
+    widthData = 400;
+  }
+
+
+    const yAxis_plot = Plot.plot({
+        width: 40,
+        height,
+        marginTop,
+        marginBottom,
+        y: yScale
+    });
+
+  let chart;
+
+  if ((dodge.length > 0) && ((typeof graph[1][xAxis]) === "string")){
     chart = (Plot.plot({
-      width: width,
-      height: height,
-      marginTop: marginTop,
-      marginRight: marginRight,
-      marginBottom: marginBottom,
-      marginLeft: marginLeft,
-      color: {legend: true},
-        marginBottom: 60,
-    x: {
-      tickRotate: -30,
-    },
+      width: widthData,
+      height,
+      marginTop,
+      marginBottom,
+      marginLeft: 10,
+    x: {nice: true,
+      tickRotate: -30},
+    y: yScale,
     marks: [
-      Plot.dot(data, Plot.dodgeX("middle", {fx: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true})),
-      Plot.crosshair(data, {x: xAxis, y: yAxis,color: fill, opacity: 0.5})
+      Plot.dot(graph, Plot.dodgeX("middle", {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true})),
+      Plot.crosshair(graph, {x: xAxis, y: yAxis, color: fill, opacity: 0.5})
     ]
   }))
   } else {
     chart = (Plot.plot({
-      width: width,
-      height: height,
-      marginTop: marginTop,
-      marginRight: marginRight,
-      marginBottom: marginBottom,
-      marginLeft: marginLeft,
-      color: {legend: true},
-        marginBottom: 60,
-    x: {
-      tickRotate: -30,
-    },
+      width: widthData,
+      height,
+      marginTop,
+      marginBottom,
+      marginLeft: 10,
+    x: {nice: true,
+      tickRotate: -30},
+    y: yScale,
     marks: [
-      Plot.dot(data, {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true}),
-      Plot.crosshair(data, {x: xAxis, y: yAxis,color: fill, opacity: 0.5})
+      Plot.dot(graph, {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true}),
+      Plot.crosshair(graph, {x: xAxis, y: yAxis, color: fill, opacity: 0.5})
     ]
   }))
-}
+  }
 
-return chart;
+    chart.classList.add("chart");
+
+    const scrollbar = html`<div class="scrollbar">`;
+    scrollbar.append(chart);
+
+    const div = html`<div class="container">`;
+    div.append(yAxis_plot, scrollbar);
+    return div;
 }
 
 const graphTypes = [
@@ -171,57 +211,47 @@ function chooseGraph(data, dodge, xCol, yCol, fill, width){
   
 }
 
-//make standard graphs if xcol exists
-function graphs(card, data, dodge, xCol, yCol, fill, width){
-  switch(card){
-    case 1:
-      return chooseGraph(data, dodge, xCol, yCol, fill, width);
-      break;
-    case 2:
-      if(headers.includes("ParticipantID")){
-        return dotPlot(data, dodge, "ParticipantID", yCol, fill, width);
-      }
-      break;
-    case 3:
-      if(headers.includes("ScenarioName")){
-        return dotPlot(data, dodge, "ScenarioName", yCol, fill, width);
-      }
-      break;
-    case 4:
-      if(headers.includes("ROI")){
-        return dotPlot(data, dodge, "ROI", yCol, fill, width);
-      }
-      break;
-    default:
-      break;
-  }
-  
-}
 ```
 ```js
 const dodgeOne = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
 ```
 <div class = "grid grid-cols-2">
   <div class="card">
-    ${resize((width) => graphs(1, data, dodgeOne, xCol, yCol, fill, width) )}
+  <div class="container">
+  <div class="scrollbar">
+    ${chooseGraph(data, dodgeOne, xCol, yCol, fill)}
+  </div>
+  </div>
   </div>
 
   <div class="card">
-    ${resize((width) => graphs(2, data, dodgeOne, xCol, yCol, fill, width) )}
+  <div class="container">
+  <div class="scrollbar">
+    ${dotPlot(data, dodgeOne, "ParticipantID", yCol, fill)}
+  </div>
+  </div>  
   </div>
 </div>
 
 
 <div class = "grid grid-cols-2">
   <div class="card">
-    ${resize((width) => graphs(3, data, dodgeOne, xCol, yCol, fill, width) )}
+  <div class="container">
+  <div class="scrollbar">
+    ${dotPlot(data, dodgeOne, "ScenarioName", yCol, fill)}
+  </div>
+  </div>
   </div>
 
 
 
 
   <div class="card">
-    ${resize((width) => graphs(4, data, dodgeOne, xCol, yCol, fill, width) )}
+  <div class="container">
+  <div class="scrollbar">
+    ${dotPlot(data, dodgeOne, "ROI", yCol, fill)}
+  </div>
+  </div>
   </div>
 </div>
 
@@ -229,3 +259,17 @@ const dodgeOne = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
     ${Inputs.table(data)}
   </div>
 
+<style>
+    .container {
+    display: flex;
+    align-items: flex-start;
+    padding-bottom: 30px;
+  }
+  .container .scrollbar {
+    overflow-x: scroll;
+    flex: 1;
+  }
+  .container .chart {
+    max-width: none;
+  }
+</style>
