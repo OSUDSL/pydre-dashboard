@@ -97,6 +97,7 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
 
   const yData = []
   let numbers = false;
+  let xType;
 
   for (let i = 0; i < graph.length; i++) {
     yData.push(graph[i][yAxis]);
@@ -108,8 +109,10 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
   let yScale;
   if (numbers){
    yScale = Plot.scale({y: {domain: d3.extent(yData), label: yAxis}});
+   xType = "Linear";
   } else {
     yScale = Plot.scale({y: {domain: [yData], label: yAxis}});
+    xType = "Point";
   }
 
 const xData = []
@@ -144,7 +147,7 @@ const xData = []
       marginBottom,
       marginLeft: 10,
     x: {nice: true,
-      tickRotate: -30},
+      tickRotate: -30, type: xType},
     y: yScale,
     marks: [
       Plot.dot(graph, Plot.dodgeX("middle", {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true})),
@@ -159,7 +162,7 @@ const xData = []
       marginBottom,
       marginLeft: 10,
     x: {nice: true,
-      tickRotate: -30},
+      tickRotate: -30, type: xType},
     y: yScale,
     marks: [
       Plot.dot(graph, {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true}),
