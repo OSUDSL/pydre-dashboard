@@ -9,9 +9,10 @@ toc: false
 
 
 ```js
-//choose input file
+// Load CSV parsing functions
 import { csvParse, autoType } from "npm:d3-dsv";
 
+// File upload input (CSV only)
 const fileName = view(
   Inputs.file({
     label: "Upload CSV File",
@@ -22,25 +23,26 @@ const fileName = view(
 ```
 
 ```js
+// Read and parse the uploaded CSV
 const text = await fileName.text();
 const raw = csvParse(text);
 
 // Get the first column’s header name
 const firstCol = raw.columns[0];
 
-//First column → String
-//Everything else → d3.autoType
+// Ensure the first column stays a string
 const customAutoType = (d) => {
   const row = autoType(d);
   row[firstCol] = String(d[firstCol]);
   return row;
 };
 
+// Apply custom typing to all rows
 const data = raw.map(customAutoType);
-view(data);
 ``` 
 
 ```js
+// All column names
 const headers = Object.keys(data[0]);
 
 const headersToRemove = [];
@@ -69,20 +71,22 @@ for (const key of headersToRemove) {
   if (idx !== -1) headers.splice(idx, 1);
 }
 
-
+// Dropdowns for x-axis, y-axis, and fill color
 const xCol = view(Inputs.select(headers, { label: "X Axis", value: headers[0] }));
 
 const yCol = view(Inputs.select(headers, { label: "Y Axis", value: headers[1] }));
 
 const fill = view(Inputs.select(headers, { label: "Color Fill", value: headers[1] }));
 
-
+// Channel checkboxes
 const channels = view(Inputs.checkbox(headers, {label: "Channels"}));
 ```
 
 ```js
+// Convert selected channel names into an object
 const channelObj = Object.fromEntries(channels.map(c => [c, c]));
 
+// Histogram plot function
 function histPlot(graph, xAxis, yAxis, fill, width) {
   return (Plot.plot({
     width,
@@ -95,6 +99,7 @@ function histPlot(graph, xAxis, yAxis, fill, width) {
 }))
 }
 
+// Main function to draw dot plot
 function dotPlot(graph, dodge, xAxis, yAxis, fill){
   const height = 500;
   const marginTop = 20;
@@ -102,6 +107,7 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
   const marginLeft = 70;
   const marginRight = 20;
 
+    // Collect Y values and check if numeric
   const yData = []
   let numbers = false;
   let xType;
@@ -113,6 +119,7 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
     }
   }
 
+  // Choose numeric or categorical Y scale
   let yScale;
   if (numbers){
    yScale = Plot.scale({y: {domain: d3.extent(yData), label: yAxis}});
@@ -122,19 +129,21 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
     xType = "Point";
   }
 
-const xData = []
+  // Unique X categories for chart width
+  const xData = []
   for (let i = 0; i < graph.length; i++) {
     if (!(xData.includes(graph[i][xAxis]))){
     xData.push(graph[i][xAxis]);
     }
   }
 
+  // Auto width adjustment
   let widthData = xData.length * 25;
-
   if(xData.length < 10){
     widthData = 400;
   }
 
+  // Y-axis plot
     const yAxis_plot = Plot.plot({
         width: 40,
         height,
@@ -143,8 +152,8 @@ const xData = []
         y: yScale
     });
 
+  // Main chart (dodged or normal)
   let chart;
-
   if ((dodge.length > 0) && ((typeof graph[1][xAxis]) === "string")){
     chart = (Plot.plot({
       width: widthData,
@@ -177,6 +186,7 @@ const xData = []
   }))
   }
 
+  // Add legend and enable scrolling
   let legend = chart.legend("color");
 
   chart.classList.add("chart");
@@ -189,17 +199,18 @@ const xData = []
   return div;
 }
 
+// Available graph types
 const graphTypes = [
   "Dot Plot",
   "Histogram",
 ];
 
+// Graph selection dropdown
 const graphType = view(Inputs.select(graphTypes, {label: "Choose Graph"}));
 ```
 
 ```js
-console.log(graphType)
-
+// Determine which graph type to draw
 function chooseGraph(data, dodge, xCol, yCol, fill, width){
   switch (graphType){
     case "Histogram":
@@ -214,9 +225,9 @@ function chooseGraph(data, dodge, xCol, yCol, fill, width){
   }
   
 }
-
 ```
 ```js
+// Dodge checkbox for graphs
 const dodgeOne = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
 ```
 <div class = "grid grid-cols-2">

@@ -16,9 +16,10 @@ Please select a CSV file from the data folder
 
 
 ```js
-//choose input file
+// Load CSV parsing functions
 import { csvParse, autoType } from "npm:d3-dsv";
 
+// File upload input (CSV only)
 const fileName = view(
   Inputs.file({
     label: "Select CSV File",
@@ -29,40 +30,72 @@ const fileName = view(
 ```
 
 ```js
+// Read and parse the uploaded CSV
 const text = await fileName.text();
 const raw = csvParse(text);
 
 // Get the first column’s header name
 const firstCol = raw.columns[0];
 
-//First column → String
-//Everything else → d3.autoType
+// Ensure the first column stays a string
 const customAutoType = (d) => {
   const row = autoType(d);
   row[firstCol] = String(d[firstCol]);
   return row;
 };
 
+// Apply custom typing to all rows
 const example_data = raw.map(customAutoType);
 ``` 
 
 ```js
+// All column names
 const headers = Object.keys(example_data[0]);
 
+const headersToRemove = [];
+
+for (const key of headers) {
+  const firstValue = example_data[0][key];
+  let isConstant = true;
+
+  // check if the value is the same in every row
+  for (let i = 1; i < example_data.length; i++) {
+    if (example_data[i][key] !== firstValue) {
+      isConstant = false;
+      break;
+    }
+  }
+
+  // if the column is constant, remove it
+  if (isConstant) {
+    headersToRemove.push(key);
+  }
+}
+
+// remove constant headers
+for (const key of headersToRemove) {
+  const idx = headers.indexOf(key);
+  if (idx !== -1) headers.splice(idx, 1);
+}
+
+// Dropdowns for x-axis, y-axis, and fill color
 const xCol = view(Inputs.select(headers, { label: "X Axis", value: headers[0] }));
 
 const yCol = view(Inputs.select(headers, { label: "Y Axis", value: headers[1] }));
 
 const fill = view(Inputs.select(headers, { label: "Color Fill", value: headers[1] }));
 
+// Channel and dodge checkboxes
 const channels = view(Inputs.checkbox(headers, {label: "Channels"}));
 
 const dodge = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
 ```
 
 ```js
+// Convert selected channel names into an object
 const channelObj = Object.fromEntries(channels.map(c => [c, c]));
 
+// Main function to draw the plot
 function makeplot(data, xAxis, yAxis, fill, dodge) {
   const height = 500;
   const marginTop = 20;
@@ -70,6 +103,7 @@ function makeplot(data, xAxis, yAxis, fill, dodge) {
   const marginLeft = 70;
   const marginRight = 20;
 
+  // Collect Y values and check if numeric
   const yData = []
   let numbers = false;
   let xType;
@@ -81,6 +115,7 @@ function makeplot(data, xAxis, yAxis, fill, dodge) {
     }
   }
 
+  // Choose numeric or categorical Y scale
   let yScale;
   if (numbers){
    yScale = Plot.scale({y: {domain: d3.extent(yData), label: yAxis}});
@@ -90,20 +125,21 @@ function makeplot(data, xAxis, yAxis, fill, dodge) {
     xType = "Point";
   }
 
-const xData = []
+  // Unique X categories for chart width
+  const xData = []
   for (let i = 0; i < data.length; i++) {
     if (!(xData.includes(data[i][xAxis]))){
     xData.push(data[i][xAxis]);
     }
   }
 
+  // Auto width adjustment
   let widthData = xData.length * 25;
-
   if(xData.length < 10){
     widthData = 400;
   }
 
-
+  // Y-axis plot
     const yAxis_plot = Plot.plot({
         width: 40,
         height,
@@ -112,6 +148,7 @@ const xData = []
         y: yScale
     });
 
+  // Main chart (dodged or normal)
 let chart;
      if ((dodge.length > 0) && ((typeof data[1][xAxis]) === "string")){
      chart = Plot.plot({
@@ -147,6 +184,7 @@ let chart;
     });
   }
 
+  // Add legend and enable scrolling
   let legend = chart.legend("color");
 
   chart.classList.add("chart");
