@@ -171,11 +171,12 @@ const xData = []
   }))
   }
 
+  let legend = chart.legend("color");
+
     chart.classList.add("chart");
 
     const scrollbar = html`<div class="scrollbar">`;
-    scrollbar.append(chart);
-
+    scrollbar.append(legend, chart);
     const div = html`<div class="container">`;
     div.append(yAxis_plot, scrollbar);
     return div;

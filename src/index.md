@@ -147,14 +147,15 @@ let chart;
     });
   }
 
-    chart.classList.add("chart");
+  let legend = chart.legend("color");
 
-    const scrollbar = html`<div class="scrollbar">`;
-    scrollbar.append(chart);
+  chart.classList.add("chart");
 
-    const div = html`<div class="container">`;
-    div.append(yAxis_plot, scrollbar);
-    return div;
+  const scrollbar = html`<div class="scrollbar">`;
+  scrollbar.append(legend, chart);
+  const div = html`<div class="container">`;
+  div.append(yAxis_plot, scrollbar);
+  return div;
 }
 ```
 
