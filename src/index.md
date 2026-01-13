@@ -89,6 +89,8 @@ const fill = view(Inputs.select(headers, { label: "Color Fill", value: headers[1
 const channels = view(Inputs.checkbox(headers, {label: "Channels"}));
 
 const dodge = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
+
+const width_Multiplier = view(Inputs.range([5, 100], {step: 1}));
 ```
 
 ```js
@@ -134,7 +136,7 @@ function makeplot(data, xAxis, yAxis, fill, dodge) {
   }
 
   // Auto width adjustment
-  let widthData = xData.length * 25;
+  let widthData = xData.length * width_Multiplier;
   if(xData.length < 10){
     widthData = 400;
   }

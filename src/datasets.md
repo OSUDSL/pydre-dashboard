@@ -96,7 +96,7 @@ function histPlot(graph, xAxis, yAxis, fill) {
 }
 
 // Main function to draw dot plot
-function dotPlot(graph, dodge, xAxis, yAxis, fill){
+function dotPlot(graph, dodge, xAxis, yAxis, fill, widthMultiplier){
   const height = 500;
   const marginTop = 20;
   const marginBottom = 60;
@@ -134,7 +134,7 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
   }
 
   // Auto width adjustment
-  let widthData = xData.length * 25;
+  let widthData = xData.length * widthMultiplier;
   if(xData.length < 10){
     widthData = 400;
   }
@@ -206,16 +206,16 @@ const graphType = view(Inputs.select(graphTypes, {label: "Choose Graph"}));
 
 ```js
 // Determine which graph type to draw
-function chooseGraph(data, dodge, xCol, yCol, fill){
+function chooseGraph(data, dodge, xCol, yCol, fill, widthMultiplier){
   switch (graphType){
     case "Histogram":
       return histPlot(data, xCol, yCol, fill);
       break;
     case "Dot Plot":
-      return dotPlot(data, dodge, xCol, yCol, fill);
+      return dotPlot(data, dodge, xCol, yCol, fill, widthMultiplier);
       break;
     default:
-      return dotPlot(data, dodge, xCol, yCol, fill);
+      return dotPlot(data, dodge, xCol, yCol, fill, widthMultiplier);
       break;
   }
   
@@ -225,13 +225,16 @@ function chooseGraph(data, dodge, xCol, yCol, fill){
 ```js
 // Dodge checkbox for first graph
 const dodgeOne = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
+
+const widthMultiplierOne = view(Inputs.range([5, 100], {step: 1}));
+
 ```
 
 <div>
   <div class="card">
   <div class="container">
   <div class="scrollbar">
-    ${chooseGraph(data, dodgeOne, xCol, yCol, fill)}
+    ${chooseGraph(data, dodgeOne, xCol, yCol, fill, widthMultiplierOne)}
   </div>
   </div>
   </div>
@@ -244,13 +247,16 @@ const yColTwo = view(Inputs.select(headers, { label: "Y Axis", value: headers[1]
 const fillTwo = view(Inputs.select(headers, { label: "Color Fill", value: headers[1] }));
 
 const dodgeTwo = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
+
+const widthMultiplierTwo = view(Inputs.range([5, 100], {step: 1}));
+
 ```
 
 <div>
   <div class="card">
   <div class="container">
   <div class="scrollbar">
-    ${dotPlot(data, dodgeTwo, "ParticipantID", yColTwo, fillTwo )}
+    ${dotPlot(data, dodgeTwo, "ParticipantID", yColTwo, fillTwo, widthMultiplierTwo)}
   </div>
   </div>  
   </div>
@@ -263,13 +269,16 @@ const yColThree = view(Inputs.select(headers, { label: "Y Axis", value: headers[
 const fillThree = view(Inputs.select(headers, { label: "Color Fill", value: headers[1] }));
 
 const dodgeThree = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
+
+const widthMultiplierThree = view(Inputs.range([5, 100], {step: 1}));
+
 ```
 
 <div>
   <div class="card">
   <div class="container">
   <div class="scrollbar">
-    ${dotPlot( data, dodgeThree, "ScenarioName", yColThree, fillThree )}
+    ${dotPlot( data, dodgeThree, "ScenarioName", yColThree, fillThree, widthMultiplierThree)}
   </div>
   </div>
   </div>
@@ -282,13 +291,16 @@ const yColFour = view(Inputs.select(headers, { label: "Y Axis", value: headers[1
 const fillFour = view(Inputs.select(headers, { label: "Color Fill", value: headers[1] }));
 
 const dodgeFour = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
+
+const widthMultiplierFour = view(Inputs.range([5, 100], {step: 1}));
+
 ```
 
 <div>
   <div class="card">
   <div class="container">
   <div class="scrollbar">
-    ${dotPlot(data, dodgeFour, "ROI", yColFour, fillFour)}
+    ${dotPlot(data, dodgeFour, "ROI", yColFour, fillFour, widthMultiplierFour)}
   </div>
   </div>
   </div>

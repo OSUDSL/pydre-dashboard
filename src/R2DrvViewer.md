@@ -130,7 +130,7 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
   }
 
   // Unique X categories for chart width
-  const xData = []
+  const xData = [];
   for (let i = 0; i < graph.length; i++) {
     if (!(xData.includes(graph[i][xAxis]))){
     xData.push(graph[i][xAxis]);
@@ -138,7 +138,7 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
   }
 
   // Auto width adjustment
-  let widthData = xData.length * 25;
+  let widthData = xData.length * width_Multiplier;
   if(xData.length < 10){
     widthData = 400;
   }
@@ -230,6 +230,9 @@ function chooseGraph(data, dodge, xCol, yCol, fill, width){
 ```js
 // Dodge checkbox for graphs
 const dodgeOne = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
+
+const width_Multiplier = view(Inputs.range([5, 100], {step: 1}));
+
 ```
 <div class = "grid grid-cols-2">
   <div class="card">
