@@ -101,7 +101,7 @@ function makeplot(data, xAxis, yAxis, fill, dodge) {
   const marginTop = 20;
   const marginBottom = 60;
   const marginLeft = 70;
-  const marginRight = 20;
+  const marginRight = 50;
 
   // Collect Y values and check if numeric
   const yData = []
@@ -141,7 +141,7 @@ function makeplot(data, xAxis, yAxis, fill, dodge) {
 
   // Y-axis plot
     const yAxis_plot = Plot.plot({
-        width: 40,
+        width: 0,
         height,
         marginTop,
         marginBottom,
@@ -156,7 +156,7 @@ let chart;
         height,
         marginTop,
         marginBottom,
-        marginLeft: 10,
+        marginLeft,
         x: {nice: true,
             tickRotate: -30, type: xType},
         y: yScale,
@@ -172,7 +172,7 @@ let chart;
         height,
         marginTop,
         marginBottom,
-        marginLeft: 10,
+        marginLeft,
         x: {nice: true,
             tickRotate: -30, type: xType},
         y: yScale,

@@ -141,7 +141,7 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
 
   // Y-axis plot
     const yAxis_plot = Plot.plot({
-        width: 40,
+        width: 0,
         height,
         marginTop,
         marginBottom,
@@ -156,7 +156,7 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
       height,
       marginTop,
       marginBottom,
-      marginLeft: 10,
+      marginLeft,
     x: {nice: true,
       tickRotate: -30, type: xType},
     y: yScale,
@@ -171,7 +171,7 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
       height,
       marginTop,
       marginBottom,
-      marginLeft: 10,
+      marginLeft,
     x: {nice: true,
       tickRotate: -30, type: xType},
     y: yScale,
