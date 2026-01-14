@@ -90,7 +90,7 @@ const channels = view(Inputs.checkbox(headers, {label: "Channels"}));
 
 const dodge = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
 
-const width_Multiplier = view(Inputs.range([5, 100], {step: 1}));
+const width_Multiplier = view(Inputs.range([1, 100], {step: 1}));
 ```
 
 ```js
@@ -108,7 +108,6 @@ function makeplot(data, xAxis, yAxis, fill, dodge) {
   // Collect Y values and check if numeric
   const yData = []
   let numbers = false;
-  let xType;
 
   for (let i = 0; i < data.length; i++) {
     yData.push(data[i][yAxis]);
@@ -121,10 +120,8 @@ function makeplot(data, xAxis, yAxis, fill, dodge) {
   let yScale;
   if (numbers){
    yScale = Plot.scale({y: {domain: d3.extent(yData), label: yAxis}});
-   xType = "Linear";
   } else {
     yScale = Plot.scale({y: {domain: [yData], label: yAxis}});
-    xType = "Point";
   }
 
   // Unique X categories for chart width
@@ -159,8 +156,8 @@ let chart;
         marginTop,
         marginBottom,
         marginLeft,
-        x: {nice: true,
-            tickRotate: -30, type: xType},
+        x: {Domain: xData, nice: true,
+            tickRotate: -30},
         y: yScale,
         marks: [
             Plot.dot(data, Plot.dodgeX("middle", {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true})),
@@ -175,8 +172,8 @@ let chart;
         marginTop,
         marginBottom,
         marginLeft,
-        x: {nice: true,
-            tickRotate: -30, type: xType},
+        x: {Domain: xData, nice: true,
+            tickRotate: -30},
         y: yScale,
         marks: [
             Plot.dot(data, {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true}),

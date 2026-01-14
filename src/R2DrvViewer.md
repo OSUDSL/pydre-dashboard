@@ -110,7 +110,6 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
     // Collect Y values and check if numeric
   const yData = []
   let numbers = false;
-  let xType;
 
   for (let i = 0; i < graph.length; i++) {
     yData.push(graph[i][yAxis]);
@@ -123,10 +122,8 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
   let yScale;
   if (numbers){
    yScale = Plot.scale({y: {domain: d3.extent(yData), label: yAxis}});
-   xType = "Linear";
   } else {
     yScale = Plot.scale({y: {domain: [yData], label: yAxis}});
-    xType = "Point";
   }
 
   // Unique X categories for chart width
@@ -162,8 +159,8 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
       marginTop,
       marginBottom,
       marginLeft,
-    x: {nice: true,
-      tickRotate: -30, type: xType},
+    x: {Domain: xData, nice: true,
+      tickRotate: -30},
     y: yScale,
     marks: [
       Plot.dot(graph, Plot.dodgeX("middle", {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true})),
@@ -177,8 +174,8 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
       marginTop,
       marginBottom,
       marginLeft,
-    x: {nice: true,
-      tickRotate: -30, type: xType},
+    x: {Domain: xData, nice: true,
+      tickRotate: -30},
     y: yScale,
     marks: [
       Plot.dot(graph, {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true}),
@@ -231,7 +228,7 @@ function chooseGraph(data, dodge, xCol, yCol, fill, width){
 // Dodge checkbox for graphs
 const dodgeOne = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
 
-const width_Multiplier = view(Inputs.range([5, 100], {step: 1}));
+const width_Multiplier = view(Inputs.range([1, 100], {step: 1}));
 
 ```
 <div class = "grid grid-cols-2">

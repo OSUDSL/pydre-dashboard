@@ -106,7 +106,6 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill, widthMultiplier){
   // Collect Y values and check if numeric
   const yData = []
   let numbers = false;
-  let xType;
 
   for (let i = 0; i < graph.length; i++) {
     yData.push(graph[i][yAxis]);
@@ -119,10 +118,8 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill, widthMultiplier){
   let yScale;
   if (numbers){
    yScale = Plot.scale({y: {domain: d3.extent(yData), label: yAxis}});
-   xType = "Linear";
   } else {
     yScale = Plot.scale({y: {domain: [yData], label: yAxis}});
-    xType = "Point";
   }
 
   // Unique X categories for chart width
@@ -157,8 +154,8 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill, widthMultiplier){
       marginTop,
       marginBottom,
       marginLeft,
-    x: {nice: true,
-      tickRotate: -30, type: xType},
+    x: {Domain: xData, nice: true,
+      tickRotate: -30},
     y: yScale,
     marks: [
       Plot.dot(graph, Plot.dodgeX("middle", {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true})),
@@ -172,8 +169,8 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill, widthMultiplier){
       marginTop,
       marginBottom,
       marginLeft,
-    x: {nice: true,
-      tickRotate: -30, type: xType},
+    x: {Domain: xData, nice: true,
+      tickRotate: -30},
     y: yScale,
     marks: [
       Plot.dot(graph, {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true}),
@@ -226,7 +223,7 @@ function chooseGraph(data, dodge, xCol, yCol, fill, widthMultiplier){
 // Dodge checkbox for first graph
 const dodgeOne = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
 
-const widthMultiplierOne = view(Inputs.range([5, 100], {step: 1}));
+const widthMultiplierOne = view(Inputs.range([1, 100], {step: 1}));
 
 ```
 
@@ -248,7 +245,7 @@ const fillTwo = view(Inputs.select(headers, { label: "Color Fill", value: header
 
 const dodgeTwo = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
 
-const widthMultiplierTwo = view(Inputs.range([5, 100], {step: 1}));
+const widthMultiplierTwo = view(Inputs.range([1, 100], {step: 1}));
 
 ```
 
@@ -270,7 +267,7 @@ const fillThree = view(Inputs.select(headers, { label: "Color Fill", value: head
 
 const dodgeThree = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
 
-const widthMultiplierThree = view(Inputs.range([5, 100], {step: 1}));
+const widthMultiplierThree = view(Inputs.range([1, 100], {step: 1}));
 
 ```
 
@@ -292,7 +289,7 @@ const fillFour = view(Inputs.select(headers, { label: "Color Fill", value: heade
 
 const dodgeFour = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
 
-const widthMultiplierFour = view(Inputs.range([5, 100], {step: 1}));
+const widthMultiplierFour = view(Inputs.range([1, 100], {step: 1}));
 
 ```
 
