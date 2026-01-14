@@ -118,14 +118,6 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
     }
   }
 
-  // Choose numeric or categorical Y scale
-  let yScale;
-  if (numbers){
-   yScale = Plot.scale({y: {domain: d3.extent(yData), label: yAxis}});
-  } else {
-    yScale = Plot.scale({y: {domain: [yData], label: yAxis}});
-  }
-
   // Unique X categories for chart width
   const xData = [];
   for (let i = 0; i < graph.length; i++) {
@@ -140,16 +132,6 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
     widthData = 400;
   }
 
-  // Y-axis plot
-    const yAxis_plot = Plot.plot({
-        width: 0,
-        height,
-        marginTop,
-        marginBottom,
-        marginLeft,
-        y: yScale
-    });
-
   // Main chart (dodged or normal)
   let chart;
   if ((dodge.length > 0) && ((typeof graph[1][xAxis]) === "string")){
@@ -161,7 +143,6 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
       marginLeft,
     x: {Domain: xData, nice: true,
       tickRotate: -30},
-    y: yScale,
     marks: [
       Plot.dot(graph, Plot.dodgeX("middle", {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true})),
       Plot.crosshair(graph, {x: xAxis, y: yAxis, color: fill, opacity: 0.5})
@@ -176,7 +157,6 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
       marginLeft,
     x: {Domain: xData, nice: true,
       tickRotate: -30},
-    y: yScale,
     marks: [
       Plot.dot(graph, {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true}),
       Plot.crosshair(graph, {x: xAxis, y: yAxis, color: fill, opacity: 0.5})
@@ -186,14 +166,15 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill){
 
   // Add legend and enable scrolling
   let legend = chart.legend("color");
+  let title = fileName["name"];
 
   chart.classList.add("chart");
 
   const scrollbar = html`<div class="scrollbar">`;
-  scrollbar.append(legend, chart);
+  scrollbar.append(title, legend, chart);
 
   const div = html`<div class="container">`;
-  div.append(yAxis_plot, scrollbar);
+  div.append(scrollbar);
   return div;
 }
 

@@ -116,14 +116,6 @@ function makeplot(data, xAxis, yAxis, fill, dodge) {
     }
   }
 
-  // Choose numeric or categorical Y scale
-  let yScale;
-  if (numbers){
-   yScale = Plot.scale({y: {domain: d3.extent(yData), label: yAxis}});
-  } else {
-    yScale = Plot.scale({y: {domain: [yData], label: yAxis}});
-  }
-
   // Unique X categories for chart width
   const xData = []
   for (let i = 0; i < data.length; i++) {
@@ -138,15 +130,6 @@ function makeplot(data, xAxis, yAxis, fill, dodge) {
     widthData = 400;
   }
 
-  // Y-axis plot
-    const yAxis_plot = Plot.plot({
-        width: 0,
-        height,
-        marginTop,
-        marginBottom,
-        y: yScale
-    });
-
   // Main chart (dodged or normal)
 let chart;
      if ((dodge.length > 0) && ((typeof data[1][xAxis]) === "string")){
@@ -158,7 +141,6 @@ let chart;
         marginLeft,
         x: {Domain: xData, nice: true,
             tickRotate: -30},
-        y: yScale,
         marks: [
             Plot.dot(data, Plot.dodgeX("middle", {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true})),
             Plot.crosshair(data, {x: xAxis, y: yAxis,color: fill, opacity: 0.5})
@@ -174,7 +156,6 @@ let chart;
         marginLeft,
         x: {Domain: xData, nice: true,
             tickRotate: -30},
-        y: yScale,
         marks: [
             Plot.dot(data, {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true}),
             Plot.crosshair(data, {x: xAxis, y: yAxis,color: fill, opacity: 0.5})
@@ -185,13 +166,14 @@ let chart;
 
   // Add legend and enable scrolling
   let legend = chart.legend("color");
+  let title = fileName["name"];
 
   chart.classList.add("chart");
 
   const scrollbar = html`<div class="scrollbar">`;
-  scrollbar.append(legend, chart);
+  scrollbar.append(title, legend, chart);
   const div = html`<div class="container">`;
-  div.append(yAxis_plot, scrollbar);
+  div.append(scrollbar);
   return div;
 }
 ```
