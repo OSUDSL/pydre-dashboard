@@ -67,16 +67,48 @@ for (const key of headersToRemove) {
   if (idx !== -1) headers.splice(idx, 1);
 }
 
+// TODO: Check File Name and remove accordingly
+
+let y_Keep, x_Keep;
+switch (fileName["name"]){
+  case "R2Drv_Metrics_GeneralDriving.csv" || "R2Drv_Metrics_GeneralDriving_validOnly.csv":
+    x_Keep = ["ScenarioName", "Case", "Location", "Gender", "Week"];
+    y_Keep = ["sdLP", "meanVelocity", "sdVelocity", "laneExceedences", "steerReversals", "percentSpeeding", "percentExtraSpeeding", "highLonAccelCount", "lowLonAccelCount", "highLatAccelCount", "highSteerAngleCount"];
+    break;
+    default:
+}
+
 // TODO: Remove unused xColumns and yColumns
+// remove constant headers
+
+let x_headers = structuredClone(headers);
+let y_headers = structuredClone(headers);
+
+for (const key of headers) {
+  if(!(y_Keep.includes(key))){
+  const idx = y_headers.indexOf(key);
+  if (idx !== -1) y_headers.splice(idx, 1);
+  }
+}
+
+for (const keys of headers) {
+  if(!(x_Keep.includes(keys))){
+  const idz = x_headers.indexOf(keys);
+  if (idz !== -1) x_headers.splice(idz, 1);
+  }
+}
 
 // Dropdowns for x-axis, y-axis, and fill color
-const xCol = view(Inputs.select(headers, { label: "X Axis", value: headers[0] }));
+const xCol = view(Inputs.select(x_headers, { label: "X Axis", value: x_headers[0] }));
 
-const fill = view(Inputs.select(headers, { label: "Color Fill", value: headers[1] }));
+const yCol = view(Inputs.select(y_headers, { label: "Y Axis", value: y_headers[0] }));
 
-// TODO: All headers as channels
+const fill = view(Inputs.select(x_headers, { label: "Color Fill", value: x_headers[1] }));
+
 // Channel checkboxes
-const channels = view(Inputs.checkbox(headers, {label: "Channels"}));
+const channels = headers;
+
+const dodge = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
 ```
 
 ```js
@@ -120,11 +152,12 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill, widthMultiplier){
   let chart;
   if ((dodge.length > 0) && ((typeof graph[1][xAxis]) === "string")){
     chart = (Plot.plot({
-      width: widthData,
+      width: widthData+100,
       height,
       marginTop,
       marginBottom,
-      marginLeft,
+      marginLeft: marginLeft+50,
+      marginRight: marginRight+50,
     x: {Domain: xData, nice: true,
       tickRotate: -30},
     marks: [
@@ -164,7 +197,18 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill, widthMultiplier){
 // TODO: Make graphs for every yColumns (Driving Stats)
 ```
 
+<div>
 
+<div class="container">
+<div class="scrollbar">
+  ${dotPlot(data, dodge, xCol, yCol, fill, width_Multiplier) }
+</div>
+</div>
+
+```js
+const width_Multiplier = view(Inputs.range([1, 100], {label: "Width", step: 1}));
+```
+<br>
 
 <style>
     .container {
