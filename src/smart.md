@@ -1,6 +1,6 @@
 ---
 theme: dashboard
-title: Data Collected
+title: Data By File
 toc: false
 ---
 
@@ -67,13 +67,14 @@ for (const key of headersToRemove) {
   if (idx !== -1) headers.splice(idx, 1);
 }
 
+// TODO: Remove unused xColumns and yColumns
+
 // Dropdowns for x-axis, y-axis, and fill color
 const xCol = view(Inputs.select(headers, { label: "X Axis", value: headers[0] }));
 
-const yCol = view(Inputs.select(headers, { label: "Y Axis", value: headers[1] }));
-
 const fill = view(Inputs.select(headers, { label: "Color Fill", value: headers[1] }));
 
+// TODO: All headers as channels
 // Channel checkboxes
 const channels = view(Inputs.checkbox(headers, {label: "Channels"}));
 ```
@@ -81,19 +82,6 @@ const channels = view(Inputs.checkbox(headers, {label: "Channels"}));
 ```js
 // Convert selected channel names into an object
 const channelObj = Object.fromEntries(channels.map(c => [c, c]));
-
-// Histogram plot function
-function histPlot(graph, xAxis, yAxis, fill) {
-  return (Plot.plot({
-    width: 600,
-  y: {grid: true},
-  color: {legend: true},
-  marks: [
-    Plot.rectY(graph, Plot.binX({y: "count"}, {x: xAxis, fill: fill, channel: channelObj, tip: true})),
-    Plot.ruleY([0]),
-  ]
-}))
-}
 
 // Main function to draw dot plot
 function dotPlot(graph, dodge, xAxis, yAxis, fill, widthMultiplier){
@@ -166,134 +154,23 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill, widthMultiplier){
 
     chart.classList.add("chart");
 
-    const scrollbar = html`<div class="scrollbar">`;
+    const scrollbar = html`<div>`;
     scrollbar.append(title, legend, chart);
-    const div = html`<div class="container">`;
+    const div = html`<div>`;
     div.append(scrollbar);
     return div;
 }
 
-// Available graph types
-const graphTypes = [
-  "Dot Plot",
-  "Histogram",
-];
-
-// Graph selection dropdown
-const graphType = view(Inputs.select(graphTypes, {label: "Choose Graph"}));
+// TODO: Make graphs for every yColumns (Driving Stats)
 ```
 
-```js
-// Determine which graph type to draw
-function chooseGraph(data, dodge, xCol, yCol, fill, widthMultiplier){
-  switch (graphType){
-    case "Histogram":
-      return histPlot(data, xCol, yCol, fill);
-      break;
-    case "Dot Plot":
-      return dotPlot(data, dodge, xCol, yCol, fill, widthMultiplier);
-      break;
-    default:
-      return dotPlot(data, dodge, xCol, yCol, fill, widthMultiplier);
-      break;
-  }
-  
-}
-```
 
-```js
-// Dodge checkbox for first graph
-const dodgeOne = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
-
-const widthMultiplierOne = view(Inputs.range([1, 100], {step: 1}));
-
-```
-
-<div>
-  <div class="card">
-  <div class="container">
-  <div class="scrollbar">
-    ${chooseGraph(data, dodgeOne, xCol, yCol, fill, widthMultiplierOne)}
-  </div>
-  </div>
-  </div>
-</div>
-
-```js
-// Controls for ParticipantID plot
-const yColTwo = view(Inputs.select(headers, { label: "Y Axis", value: headers[1] }));
-
-const fillTwo = view(Inputs.select(headers, { label: "Color Fill", value: headers[1] }));
-
-const dodgeTwo = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
-
-const widthMultiplierTwo = view(Inputs.range([1, 100], {step: 1}));
-
-```
-
-<div>
-  <div class="card">
-  <div class="container">
-  <div class="scrollbar">
-    ${dotPlot(data, dodgeTwo, "ParticipantID", yColTwo, fillTwo, widthMultiplierTwo)}
-  </div>
-  </div>  
-  </div>
-</div>
-
-```js
-// Controls for ScenarioName plot
-const yColThree = view(Inputs.select(headers, { label: "Y Axis", value: headers[1] }));
-
-const fillThree = view(Inputs.select(headers, { label: "Color Fill", value: headers[1] }));
-
-const dodgeThree = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
-
-const widthMultiplierThree = view(Inputs.range([1, 100], {step: 1}));
-
-```
-
-<div>
-  <div class="card">
-  <div class="container">
-  <div class="scrollbar">
-    ${dotPlot( data, dodgeThree, "ScenarioName", yColThree, fillThree, widthMultiplierThree)}
-  </div>
-  </div>
-  </div>
-</div>
-
-```js
-// Controls for ROI plot
-const yColFour = view(Inputs.select(headers, { label: "Y Axis", value: headers[1] }));
-
-const fillFour = view(Inputs.select(headers, { label: "Color Fill", value: headers[1] }));
-
-const dodgeFour = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
-
-const widthMultiplierFour = view(Inputs.range([1, 100], {step: 1}));
-
-```
-
-<div>
-  <div class="card">
-  <div class="container">
-  <div class="scrollbar">
-    ${dotPlot(data, dodgeFour, "ROI", yColFour, fillFour, widthMultiplierFour)}
-  </div>
-  </div>
-  </div>
-</div>
-
-  <div class="card">
-    ${Inputs.table(data)}
-  </div>
 
 <style>
     .container {
     display: flex;
     align-items: flex-start;
-    padding-bottom: 30px;
+    padding-bottom: 0px;
   }
   .container .scrollbar {
     overflow-x: scroll;

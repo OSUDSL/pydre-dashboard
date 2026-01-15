@@ -1,6 +1,6 @@
 ---
 theme: dashboard
-title: Dashboard
+title: R2Drv Dashboard
 toc: false
 ---
 
@@ -22,7 +22,7 @@ import { csvParse, autoType } from "npm:d3-dsv";
 // File upload input (CSV only)
 const fileName = view(
   Inputs.file({
-    label: "Select CSV File",
+    label: "Upload CSV File",
     accept: ".csv",
     required: true
   })
@@ -45,22 +45,22 @@ const customAutoType = (d) => {
 };
 
 // Apply custom typing to all rows
-const example_data = raw.map(customAutoType);
+const data = raw.map(customAutoType);
 ``` 
 
 ```js
 // All column names
-const headers = Object.keys(example_data[0]);
+const headers = Object.keys(data[0]);
 
 const headersToRemove = [];
 
 for (const key of headers) {
-  const firstValue = example_data[0][key];
+  const firstValue = data[0][key];
   let isConstant = true;
 
   // check if the value is the same in every row
-  for (let i = 1; i < example_data.length; i++) {
-    if (example_data[i][key] !== firstValue) {
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][key] !== firstValue) {
       isConstant = false;
       break;
     }
@@ -85,42 +85,51 @@ const yCol = view(Inputs.select(headers, { label: "Y Axis", value: headers[1] })
 
 const fill = view(Inputs.select(headers, { label: "Color Fill", value: headers[1] }));
 
-// Channel and dodge checkboxes
+// Channel checkboxes
 const channels = view(Inputs.checkbox(headers, {label: "Channels"}));
-
-const dodge = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
-
-const width_Multiplier = view(Inputs.range([1, 100], {step: 1}));
 ```
 
 ```js
 // Convert selected channel names into an object
 const channelObj = Object.fromEntries(channels.map(c => [c, c]));
 
-// Main function to draw the plot
-function makeplot(data, xAxis, yAxis, fill, dodge) {
+// Histogram plot function
+function histPlot(graph, xAxis, yAxis, fill, width) {
+  return (Plot.plot({
+    width,
+  y: {grid: true},
+  color: {legend: true},
+  marks: [
+    Plot.rectY(graph, Plot.binX({y: "count"}, {x: xAxis, fill: fill, channels: channelObj, tip: true})),
+    Plot.ruleY([0]),
+  ]
+}))
+}
+
+// Main function to draw dot plot
+function dotPlot(graph, dodge, xAxis, yAxis, fill){
   const height = 500;
   const marginTop = 20;
   const marginBottom = 60;
   const marginLeft = 70;
-  const marginRight = 50;
+  const marginRight = 20;
 
-  // Collect Y values and check if numeric
+    // Collect Y values and check if numeric
   const yData = []
   let numbers = false;
 
-  for (let i = 0; i < data.length; i++) {
-    yData.push(data[i][yAxis]);
-    if (typeof (data[i][yAxis]) === "number"){
+  for (let i = 0; i < graph.length; i++) {
+    yData.push(graph[i][yAxis]);
+    if (typeof (graph[i][yAxis]) === "number"){
       numbers = true;
     }
   }
 
   // Unique X categories for chart width
-  const xData = []
-  for (let i = 0; i < data.length; i++) {
-    if (!(xData.includes(data[i][xAxis]))){
-    xData.push(data[i][xAxis]);
+  const xData = [];
+  for (let i = 0; i < graph.length; i++) {
+    if (!(xData.includes(graph[i][xAxis]))){
+    xData.push(graph[i][xAxis]);
     }
   }
 
@@ -131,37 +140,35 @@ function makeplot(data, xAxis, yAxis, fill, dodge) {
   }
 
   // Main chart (dodged or normal)
-let chart;
-     if ((dodge.length > 0) && ((typeof data[1][xAxis]) === "string")){
-     chart = Plot.plot({
-        width: widthData,
-        height,
-        marginTop,
-        marginBottom,
-        marginLeft,
-        x: {Domain: xData, nice: true,
-            tickRotate: -30},
-        marks: [
-            Plot.dot(data, Plot.dodgeX("middle", {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true})),
-            Plot.crosshair(data, {x: xAxis, y: yAxis,color: fill, opacity: 0.5})
-            
-        ]
-    });
+  let chart;
+  if ((dodge.length > 0) && ((typeof graph[1][xAxis]) === "string")){
+    chart = (Plot.plot({
+      width: widthData,
+      height,
+      marginTop,
+      marginBottom,
+      marginLeft,
+    x: {Domain: xData, nice: true,
+      tickRotate: -30},
+    marks: [
+      Plot.dot(graph, Plot.dodgeX("middle", {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true})),
+      Plot.crosshair(graph, {x: xAxis, y: yAxis, color: fill, opacity: 0.5})
+    ]
+  }))
   } else {
-     chart = Plot.plot({
-        width: widthData,
-        height,
-        marginTop,
-        marginBottom,
-        marginLeft,
-        x: {Domain: xData, nice: true,
-            tickRotate: -30},
-        marks: [
-            Plot.dot(data, {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true}),
-            Plot.crosshair(data, {x: xAxis, y: yAxis,color: fill, opacity: 0.5})
-            
-        ]
-    });
+    chart = (Plot.plot({
+      width: widthData,
+      height,
+      marginTop,
+      marginBottom,
+      marginLeft,
+    x: {Domain: xData, nice: true,
+      tickRotate: -30},
+    marks: [
+      Plot.dot(graph, {x: xAxis, y: yAxis, stroke: fill, channels: channelObj, tip: true}),
+      Plot.crosshair(graph, {x: xAxis, y: yAxis, color: fill, opacity: 0.5})
+    ]
+  }))
   }
 
   // Add legend and enable scrolling
@@ -170,28 +177,92 @@ let chart;
 
   chart.classList.add("chart");
 
-  const scrollbar = html`<div class="scrollbar">`;
+  const scrollbar = html`<div>`;
   scrollbar.append(title, legend, chart);
+
   const div = html`<div class="container">`;
   div.append(scrollbar);
   return div;
 }
+
+// Available graph types
+const graphTypes = [
+  "Dot Plot",
+  "Histogram",
+];
+
+// Graph selection dropdown
+const graphType = view(Inputs.select(graphTypes, {label: "Choose Graph"}));
 ```
 
+```js
+// Determine which graph type to draw
+function chooseGraph(data, dodge, xCol, yCol, fill, width){
+  switch (graphType){
+    case "Histogram":
+      return histPlot(data, xCol, yCol, fill, width);
+      break;
+    case "Dot Plot":
+      return dotPlot(data, dodge, xCol, yCol, fill, width);
+      break;
+    default:
+      return dotPlot(data, dodge, xCol, yCol, fill, width);
+      break;
+  }
+  
+}
+```
+```js
+// Dodge checkbox for graphs
+const dodgeOne = view(Inputs.checkbox(["Dodge"], {label: "Dodge"}));
 
-<div>
+const width_Multiplier = view(Inputs.range([1, 100], {label: "Width", step: 1}));
 
-<div class="container">
-<div class="scrollbar">
-  ${makeplot(example_data, xCol, yCol, fill, dodge) }
+```
+<div class = "grid grid-cols-2">
+  <div class="card">
+  <div class="container">
+  <div class="scrollbar">
+    ${chooseGraph(data, dodgeOne, xCol, yCol, fill)}
+  </div>
+  </div>
+  </div>
+
+  <div class="card">
+  <div class="container">
+  <div class="scrollbar">
+    ${dotPlot(data, dodgeOne, "ParticipantID", yCol, fill)}
+  </div>
+  </div>  
+  </div>
 </div>
+
+
+<div class = "grid grid-cols-2">
+  <div class="card">
+  <div class="container">
+  <div class="scrollbar">
+    ${dotPlot(data, dodgeOne, "ScenarioName", yCol, fill)}
+  </div>
+  </div>
+  </div>
+
+
+
+
+  <div class="card">
+  <div class="container">
+  <div class="scrollbar">
+    ${dotPlot(data, dodgeOne, "ROI", yCol, fill)}
+  </div>
+  </div>
+  </div>
 </div>
 
   <div class="card">
-    ${Inputs.table(example_data)}
+    ${Inputs.table(data)}
   </div>
 
-</div>
 
 <style>
 
@@ -237,7 +308,7 @@ let chart;
   .container {
     display: flex;
     align-items: flex-start;
-    padding-bottom: 30px;
+    padding-bottom: 0px;
   }
   .container .scrollbar {
     overflow-x: scroll;
