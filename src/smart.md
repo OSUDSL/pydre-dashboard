@@ -145,7 +145,7 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill, widthMultiplier){
   // Auto width adjustment
   let widthData = xData.length * widthMultiplier;
   if(xData.length < 10){
-    widthData = 400;
+    widthData = 10 * widthMultiplier;
   }
 
   // Main chart (dodged or normal)
@@ -195,19 +195,52 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill, widthMultiplier){
 }
 
 // TODO: Make graphs for every yColumns (Driving Stats)
+function makeGraphs(){
+  const wrapper = html`<div></div>`;
+
+  for (let i = 0; i < x_headers.length; i += 2){
+    const grid = html`<div class="grid grid-cols-2"></div>`;
+
+    // first graph
+    const card1 = html`
+      <div class="card">
+        <div class="container">
+          <div class="scrollbar"></div>
+        </div>
+      </div>`;
+    card1.querySelector(".scrollbar")
+      .append(dotPlot(data, dodge, x_headers[i], yCol, fill, width_Multiplier));
+
+    grid.append(card1);
+
+    // second graph (if it exists)
+    if (i + 1 < x_headers.length){
+      const card2 = html`
+        <div class="card">
+          <div class="container">
+            <div class="scrollbar"></div>
+          </div>
+        </div>`;
+      card2.querySelector(".scrollbar").append(dotPlot(data, dodge, x_headers[i+1], yCol, fill, width_Multiplier));
+
+      grid.append(card2);
+    }
+
+    wrapper.append(grid);
+  }
+
+  return wrapper;
+}
 ```
-
-<div>
-
-<div class="container">
-<div class="scrollbar">
-  ${dotPlot(data, dodge, xCol, yCol, fill, width_Multiplier) }
-</div>
-</div>
 
 ```js
 const width_Multiplier = view(Inputs.range([1, 100], {label: "Width", step: 1}));
 ```
+
+<div>
+${makeGraphs()}
+</div>
+
 <br>
 
 <style>
