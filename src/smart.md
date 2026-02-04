@@ -71,14 +71,42 @@ for (const key of headersToRemove) {
 
 let y_Keep, x_Keep;
 switch (fileName["name"]){
-  case "R2Drv_Metrics_GeneralDriving.csv" || "R2Drv_Metrics_GeneralDriving_validOnly.csv":
+  case "R2Drv_Metrics_Boxes.csv":
+  case "R2Drv_Metrics_Boxes_Accuracy.csv":
+    x_Keep = [];
+    y_Keep = [];
+    break;
+  case "R2Drv_Metrics_CriticalEvent_Anticipation.csv":
+  case "R2Drv_Metrics_CriticalEvent_Anticipation_validOnly.csv":
+    x_Keep = [];
+    y_Keep = [];
+    break;
+  case "R2Drv_Metrics_CriticalEvent_Recover.csv":
+  case "R2Drv_Metrics_CriticalEvent_Recover_validOnly.csv":
+    x_Keep = [];
+    y_Keep = [];
+    break;
+  case "R2Drv_Metrics_FollowTask.csv":
+  case "R2Drv_Metrics_FollowTask_validOnly.csv":
+    x_Keep = [];
+    y_Keep = [];
+    break;
+  case "R2Drv_Metrics_GeneralDriving.csv":
+  case "R2Drv_Metrics_GeneralDriving_validOnly.csv":
     x_Keep = ["ScenarioName", "Case", "Location", "Gender", "Week"];
     y_Keep = ["sdLP", "meanVelocity", "sdVelocity", "laneExceedences", "steerReversals", "percentSpeeding", "percentExtraSpeeding", "highLonAccelCount", "lowLonAccelCount", "highLatAccelCount", "highSteerAngleCount"];
     break;
-    default:
+  case "R2Drv_Metrics_ValidReport.csv":
+    x_Keep = [];
+    y_Keep = [];
+    break;
+  default:
+    x_Keep = [];
+    y_Keep = [];
+    break;
 }
 
-// TODO: Remove unused xColumns and yColumns
+// Remove unused xColumns and yColumns
 // remove constant headers
 
 let x_headers = structuredClone(headers);
@@ -99,8 +127,6 @@ for (const keys of headers) {
 }
 
 // Dropdowns for x-axis, y-axis, and fill color
-const xCol = view(Inputs.select(x_headers, { label: "X Axis", value: x_headers[0] }));
-
 const yCol = view(Inputs.select(y_headers, { label: "Y Axis", value: y_headers[0] }));
 
 const fill = view(Inputs.select(x_headers, { label: "Color Fill", value: x_headers[1] }));
@@ -194,7 +220,7 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill, widthMultiplier){
     return div;
 }
 
-// TODO: Make graphs for every yColumns (Driving Stats)
+//Make graphs for every xColumns (Driving Stats)
 function makeGraphs(){
   const wrapper = html`<div></div>`;
 
