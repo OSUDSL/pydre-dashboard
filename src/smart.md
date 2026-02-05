@@ -73,36 +73,32 @@ let y_Keep, x_Keep;
 switch (fileName["name"]){
   case "R2Drv_Metrics_Boxes.csv":
   case "R2Drv_Metrics_Boxes_Accuracy.csv":
-    x_Keep = [];
-    y_Keep = [];
+    x_Keep = ["ScenarioName", "Case", "Location", "Gender", "Week"];
+    y_Keep = ["meanVelocity", "sdVelocity", "sdLP",	"minLP",	"maxLP", "meanLP", "startSimTime", "relBoxPos", "startXPos", "reactionTime"];
     break;
   case "R2Drv_Metrics_CriticalEvent_Anticipation.csv":
   case "R2Drv_Metrics_CriticalEvent_Anticipation_validOnly.csv":
-    x_Keep = [];
-    y_Keep = [];
+    x_Keep = ["ScenarioName", "Case", "Location", "Gender", "Week"];
+    y_Keep = ["CriticalEventStart",	"CriticalEventEnd",	"EventName",	"minVelocity", "minAcceleration", "maxAcceleration", "cutInBrakeRXN", "cutInThrottleRXN", "cutInLaneOffsetRXN", "cutOffBrakeRXN", "cutOffThrottleRXN", "cutOffLaneOffsetRXN", "trashTipBrakeRXN", "trashTipThrottleRXN", "trashTipLaneOffsetRXN", "maxLaneDeviation", "maxSteer", "minHeadwayDistance"];
     break;
   case "R2Drv_Metrics_CriticalEvent_Recover.csv":
   case "R2Drv_Metrics_CriticalEvent_Recover_validOnly.csv":
-    x_Keep = [];
-    y_Keep = [];
+    x_Keep = ["ScenarioName", "Case", "Location", "Gender", "Week"];
+    y_Keep = ["CriticalEventStart",	"CriticalEventEnd",	"EventName",	"startVelocity",	"minVelocity",	"minAcceleration",	"maxAcceleration",	"cutInBrakeRXN",	"cutInThrottleRXN",	"cutInLaneOffsetRXN",	"cutOffBrakeRXN",	"cutOffThrottleRXN",	"cutOffLaneOffsetRXN",	"trashTipBrakeRXN",	"trashTipThrottleRXN",	"trashTipLaneOffsetRXN",	"headwayBrakeRXN",	"maxLaneDeviation",	"minHeadwayDistance",	"velocityAtTrashtipRXN",	"avgAccelTrashtipRXN",	"maxSteer",	"trashStartDist",	"trashMinDistance",	"timeToVeloRecovery",	"timeToPosRecovery"];
     break;
   case "R2Drv_Metrics_FollowTask.csv":
   case "R2Drv_Metrics_FollowTask_validOnly.csv":
-    x_Keep = [];
-    y_Keep = [];
+    x_Keep = ["ScenarioName", "Case", "Location", "Gender", "Week"];
+    y_Keep = ["maxAcceleration", "meanVelocity", "sdVelocity", "sdLP", "minLP", "maxLP", "meanLP", "startSimTime", "startXPos", "rxnTimeBrake", "rxnTimeThrottle", "rxnTimeLaneOffset", "minHeadwayDistance", "avgFollowingDistance", "maxHeadwayDistance"];
     break;
   case "R2Drv_Metrics_GeneralDriving.csv":
   case "R2Drv_Metrics_GeneralDriving_validOnly.csv":
     x_Keep = ["ScenarioName", "Case", "Location", "Gender", "Week"];
     y_Keep = ["sdLP", "meanVelocity", "sdVelocity", "laneExceedences", "steerReversals", "percentSpeeding", "percentExtraSpeeding", "highLonAccelCount", "lowLonAccelCount", "highLatAccelCount", "highSteerAngleCount"];
     break;
-  case "R2Drv_Metrics_ValidReport.csv":
-    x_Keep = [];
-    y_Keep = [];
-    break;
   default:
-    x_Keep = [];
-    y_Keep = [];
+    x_Keep = headers;
+    y_Keep = headers;
     break;
 }
 
@@ -222,6 +218,7 @@ function dotPlot(graph, dodge, xAxis, yAxis, fill, widthMultiplier){
 
 //Make graphs for every xColumns (Driving Stats)
 function makeGraphs(){
+
   const wrapper = html`<div></div>`;
 
   for (let i = 0; i < x_headers.length; i += 2){
@@ -234,9 +231,8 @@ function makeGraphs(){
           <div class="scrollbar"></div>
         </div>
       </div>`;
-    card1.querySelector(".scrollbar")
-      .append(dotPlot(data, dodge, x_headers[i], yCol, fill, width_Multiplier));
 
+    card1.querySelector(".scrollbar").append(dotPlot(data, dodge, x_headers[i], yCol, fill, width_Multiplier));
     grid.append(card1);
 
     // second graph (if it exists)
@@ -247,8 +243,8 @@ function makeGraphs(){
             <div class="scrollbar"></div>
           </div>
         </div>`;
-      card2.querySelector(".scrollbar").append(dotPlot(data, dodge, x_headers[i+1], yCol, fill, width_Multiplier));
 
+      card2.querySelector(".scrollbar").append(dotPlot(data, dodge, x_headers[i+1], yCol, fill, width_Multiplier));
       grid.append(card2);
     }
 
